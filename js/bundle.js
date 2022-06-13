@@ -550,11 +550,11 @@ let mapFillColor = '#204669', //'#C2DACA',//'#2F9C67',
     mapInactive = '#F2F2EF',
     mapActive = '#D90368',
     hoverColor = '#D90368',
-    mapNotClickedColor = "#fdebe9",
-    mapClickedColor = "#2F9C67";
+    mapNotClickedColor = "#E9F1EA",
+    mapClickedColor = "#f0473a";
 let countrySelectedFromMap = "";
-let mapColorRange = ['#fdebe9', '#fac2bd', '#f79992', '#f37066']; //, '#f0473a'];
-// let mapColorRange = ['#E9F1EA', '#C2DACA', '#9EC8AE', '#78B794', '#2F9C67'];
+// let mapColorRange = ['#fdebe9', '#fac2bd', '#f79992', '#f37066']; //, '#f0473a'];
+let mapColorRange = ['#E9F1EA', '#C2DACA', '#9EC8AE', '#78B794', '#2F9C67'];
 let mapScale = d3.scaleQuantize()
     .domain([0, 100])
     .range(mapColorRange);
@@ -587,7 +587,7 @@ function initiateMap() {
     mapsvg.append("rect")
         .attr("width", "100%")
         .attr("height", "100%")
-        .attr("fill", "#faeefa");
+        .attr("fill", "#fff");
 
     //map tooltips
     var maptip = d3.select('#map').append('div').attr('class', 'd3-tip map-tip hidden');
