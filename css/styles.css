@@ -241,7 +241,7 @@ ul {
     font-size: 18px;
     display: grid;
     border-radius: 50% !important;
-    background: #FFF6F4;
+    /* background: #FFF6F4; */
     color: #fff;
     border: none;
     user-select: none;
@@ -250,8 +250,8 @@ ul {
 }
 
 .zoom-controls button:hover {
-    /* background: rgba(200, 200, 200, 0.8); */
-    background: #f0473a;
+    background: rgba(200, 200, 200, 0.8);
+    /* background: #f0473a; */
 }
 
 .zoom-controls button:active {
