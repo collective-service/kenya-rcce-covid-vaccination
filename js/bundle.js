@@ -553,7 +553,7 @@ let mapFillColor = '#204669', //'#C2DACA',//'#2F9C67',
     mapNotClickedColor = "#fdebe9",
     mapClickedColor = "#2F9C67";
 let countrySelectedFromMap = "";
-let mapColorRange = ['#fdebe9', '#fac2bd', '#f79992', '#f37066', '#f0473a'];
+let mapColorRange = ['#fdebe9', '#fac2bd', '#f79992', '#f37066']; //, '#f0473a'];
 // let mapColorRange = ['#E9F1EA', '#C2DACA', '#9EC8AE', '#78B794', '#2F9C67'];
 let mapScale = d3.scaleQuantize()
     .domain([0, 100])
