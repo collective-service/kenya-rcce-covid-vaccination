@@ -1,0 +1,15 @@
+{
+    "Partner": "name_org",
+    "Partner_short": "Acr_org",
+    "Activity": "activity",
+    "Activity_desc": "",
+    "Partner_filtres_tag": "Reporting/repeat/health",
+    "Country": "country",
+    "ISO3": "county_code",
+    "MapAdminLevel": "country",
+    "Target": "population",
+    "Contact_name": "name_contact",
+    "Contact_role": "role",
+    "Contact_email": "email_contact",
+    "last_Date": "June 7, 2022"
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://www.rcce-collective.net/wp-content/uploads/2021/04/android-chrome-192x192-1.png" sizes="192x192" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.11/c3.min.css" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/39e5643f1a.js"></script>
+    <script src="https://d3js.org/d3.v5.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <link href='css/styles.css' rel='stylesheet' />
+    <title>Kenya COVID Vaccination Partner Mapping</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="main">
+
+            <div class="leftSide">
+                <div class="leftPanel flexCol">
+                    <header>
+                        <h5>Kenya COVID-19 Vaccination Partner Mapping</h5>
+                        <p class="text-accroche">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore iusto sed voluptate tenetur et maiores assumenda, quaerat accusantium ipsam ad dolorum suscipit eius officia corrupti mollitia.</p>
+                        <p class="source" id="date_updated">Data as of 10/06/2022</p>
+                    </header>
+                    <div class="item-list">
+                        <section>
+                            <div class="dropdown flexCol">
+                                <h6 id="h6Fix"><label for="">Display by</label></h6>
+                                <select id="displayBySelect">
+                                    <option value="activity" selected>Activity</option>
+                                    <option value="partner">Partner</option>
+                                    <!-- <option value="location">Location</option> -->
+                                </select>
+                            </div>
+                        </section>
+                        <!-- <section>
+                            <div class="main-filters">
+                                <div class="parentFilters"></div>
+                            </div>
+                        </section> -->
+                        <section>
+                            <div class="content parent">
+                                <h6 id="h6Fix">Activities</h6>
+                                <div class="item-selections">
+                                    <button class="select-reset">Clear selection</button>
+                                    <!-- <button class="select-all">Select all</button> -->
+                                </div>
+                                <main>
+                                    <ul class="collection-item"></ul>
+                                </main>
+
+                            </div>
+                        </section>
+                    </div>
+
+                </div>
+                <div class="contentPanel" id="contentPanel">
+                    <div class="content flexCol child">
+                        <h6 id="h6Fix">Partners</h6>
+                        <section>
+                            <div class="second-filters">
+                                <div class="childrenFilters"></div>
+                            </div>
+                        </section>
+                        <div class="children-selections">
+                            <button class="select-reset">Clear selection</button>
+                            <!-- <button class="select-all">Select all</button> -->
+                        </div>
+
+                        <section>
+                            <div class="mainContent">
+                                <main>
+                                    <ul class="children"></ul>
+                                </main>
+
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="map">
+                    <div class="map-filter"></div>
+                    <div id="map">
+                        <div class="zoom-controls">
+                            <button id="zoom_in">+</button>
+                            <button id="zoom_out">-</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end leftSide -->
+            <div class="rightSide">
+                <div class="details">
+
+                    <div class="metrics">
+                        <header>
+                            <h6>Overall</h6>
+                        </header>
+                        <section>
+                            <div class="metrics-stats">
+                                <div class="keyFigures">
+                                    <div class="figure">
+                                        <div id="number1" class="number">1234</div>
+                                        <div id="desc1" class="desc">orgs</div>
+                                    </div>
+                                    <div class="figure">
+                                        <div id="number2" class="number">1234</div>
+                                        <div id="desc2" class="desc">counties</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="metrics">
+                        <header>
+                            <h6>Timeframe</h6>
+                        </header>
+                        <section>
+                            <div class="metrics-stats">
+                                <div class="target-pop"></div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="metrics">
+                        <header>
+                            <h6>Contact</h6>
+                        </header>
+                        <section>
+                            <div class="metrics-stats">
+                                <div class="contact-details"></div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+            <!-- end rightSide -->
+        </div>
+    </div>
+    <script type='text/javascript' src='js/bundle.js'></script>
+</body>
+
+</html>
