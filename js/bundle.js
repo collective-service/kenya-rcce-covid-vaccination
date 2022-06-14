@@ -287,6 +287,10 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
         }
 
         updateDataFromFilters();
+        const parentsArr = getUpdatedParentArr();
+        // console.log(childrenArr)
+        createPanelListItems(parentsArr);
+
         choroplethMap();
         setMetricsPanels();
         //update metrics
