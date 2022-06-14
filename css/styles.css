@@ -1,6 +1,7 @@
-/* .container-fluid {
-    background: #faeefa;
-} */
+.container-fluid {
+    /* background: #faeefa; */
+    padding: 0 5px;
+}
 
 body {
     font-size: 12px;
@@ -31,7 +32,7 @@ body {
 
 .main .leftPanel {
     flex-shrink: 0;
-    width: 300px;
+    width: 260px;
     padding: 8px;
     background: rgb(255, 255, 255, 38%);
     box-shadow: 0 2px 12px rgb(0 0 0 / 19%);
@@ -62,7 +63,7 @@ h5 {
 }
 
 .dropdown select {
-    width: 250px;
+    width: 90%;
     margin-left: 8px;
     height: 30px;
 }
@@ -106,7 +107,7 @@ h5 {
 } */
 
 .main .rightSide {
-    width: 300px;
+    width: 200px;
 }
 
 .item-list section {
@@ -223,14 +224,15 @@ ul {
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    padding: 10px 8px;
+    /* justify-content: center;
+    align-items: center; */
 }
 
 .zoom-controls {
     position: absolute;
-    right: 290px;
-    top: 100px;
+    /* right: 290px;
+    top: 100px; */
     display: grid;
     grid-gap: 5px;
 }
@@ -273,13 +275,16 @@ svg g path path.inactive {
 .map-filter {
     display: flex;
     gap: 15px;
+    padding: 10px 8px;
+    justify-content: center;
+    align-items: center;
 }
 
 .map-filter button,
 .map-filter span {
     text-transform: uppercase;
     color: #838383;
-    font-size: 11px;
+    font-size: 1rem;
     font-weight: 400;
     padding: 0 10px;
 }
@@ -290,6 +295,7 @@ svg g path path.inactive {
     border: none;
     cursor: pointer;
     color: #1c99f2;
+    font-size: 11px;
 }
 
 .map-filter span {
@@ -315,7 +321,7 @@ svg g path path.inactive {
     background: rgb(255, 255, 255, 38%);
     box-shadow: 0 2px 12px rgb(0 0 0 / 19%);
     margin-top: 10px;
-    padding: 8px 20px;
+    padding: 8px 10px;
     /* border-radius: 8px; */
 }
 
@@ -380,3 +386,10 @@ svg g path path.inactive {
     font-weight: 400;
     padding: 5px 0;
 }
+
+
+/* @media only screen and (max-width: 767px) {
+    .main .rightSide {
+        width: 120px;
+    }
+} */

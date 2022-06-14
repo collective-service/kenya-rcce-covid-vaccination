@@ -574,15 +574,16 @@ let mapScale = d3.scaleQuantize()
 
 function initiateMap() {
     width = viewportWidth - 560 - document.getElementById("rightSide").offsetWidth;
-    console.log(width)
-        // height = (isMobile) ? 400 : 500;
+    // height = (isMobile) ? 400 : 500;
     height = 90;
-    var mapScale = (isMobile) ? width / 5.5 : width * 8.5;
-    var mapCenter = (isMobile) ? [12, 12] : [34, 5.9];
-    // console.log(width)
+    const mapPosition = width <= 503 ? [35.3, 7.5] : [33.5, 6.5];
+    const mapZoomSize = width <= 503 ? 2500 : 3900;
+    var mapScale = (isMobile) ? 2500 : mapZoomSize; //width * 8.5;
+    var mapCenter = (isMobile) ? [12, 12] : mapPosition;
+    console.log(width)
     projection = d3.geoMercator()
         .center(mapCenter)
-        .scale(3870)
+        .scale(mapScale)
         .translate([width / 3.9, height / 2]);
     // .translate([-1000, -500]);
 
