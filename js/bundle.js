@@ -573,10 +573,11 @@ let mapScale = d3.scaleQuantize()
     .range(mapColorRange);
 
 function initiateMap() {
-    width = viewportWidth - 860; //document.getElementsByClassName("map").offsetWidth;
-    // height = (isMobile) ? 400 : 500;
+    width = viewportWidth - 560 - document.getElementById("rightSide").offsetWidth;
+    console.log(width)
+        // height = (isMobile) ? 400 : 500;
     height = 90;
-    var mapScale = (isMobile) ? width / 5.5 : width / 1.5;
+    var mapScale = (isMobile) ? width / 5.5 : width * 8.5;
     var mapCenter = (isMobile) ? [12, 12] : [34, 5.9];
     // console.log(width)
     projection = d3.geoMercator()
