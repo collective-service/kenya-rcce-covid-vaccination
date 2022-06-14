@@ -176,6 +176,13 @@ function getSelectedItemFromUl(className) {
         const selection = d3.select(this).selectAll(".item").select("h6").text();
         isSelected ? selections.push(selection) : null;
     });
+    for (let index = 0; index < selections.length; index++) {
+        const element = selections[index];
+        if (element == "monitoring & evaluation") {
+            selections[index] = "monitoring_eval";
+            break;
+        }
+    }
     return selections;
 } //getSelectedItemFromUl
 
