@@ -24,6 +24,7 @@ $(document).ready(function() {
             data[1] = data[1].filter(d => { return d[config.ISO3] != ""; });
             data[1].forEach(element => {
                 element[config.Partner_short] == "" ? element[config.Partner_short] = element[config.Partner] : null;
+                // element[config.Activity] == "monitoring_eval" ? element[config.Activity] = "monitoring & evaluation" : null;
             });
             mappingData = data[1];
             filteredMappingData = mappingData;
@@ -340,7 +341,8 @@ function getColumnUniqueValues(columnName, data = filteredMappingData, colInConf
     activityCountArr.sort(sortNestedData);
     var orderedArr = [];
     activityCountArr.forEach(act => {
-        orderedArr.push(act.key);
+        const acti = act.key == "monitoring_eval" ? "monitoring & evaluation" : act.key;
+        orderedArr.push(acti);
     });
     return orderedArr;
 } //getColumnUniqueValues
@@ -564,11 +566,11 @@ function initiateMap() {
     // height = (isMobile) ? 400 : 500;
     height = 90;
     var mapScale = (isMobile) ? width / 5.5 : width / 1.5;
-    var mapCenter = (isMobile) ? [12, 12] : [34, 6.5];
+    var mapCenter = (isMobile) ? [12, 12] : [34, 5.9];
     // console.log(width)
     projection = d3.geoMercator()
         .center(mapCenter)
-        .scale(3900)
+        .scale(3870)
         .translate([width / 3.9, height / 2]);
     // .translate([-1000, -500]);
 
