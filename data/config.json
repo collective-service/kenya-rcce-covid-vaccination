@@ -2,7 +2,6 @@
     "Partner": "name_org",
     "Partner_short": "Acr_org",
     "Activity": "activity",
-    "Activity_desc": "",
     "Partner_filtres_tag": "Reporting/repeat/health",
     "Country": "country",
     "ISO3": "county_code",
@@ -11,5 +10,16 @@
     "Contact_name": "name_contact",
     "Contact_role": "role",
     "Contact_email": "email_contact",
-    "last_Date": "June 7, 2022"
+    "last_Date": "June 7, 2022",
+    "Activity_desc": {
+        "rcce": "Risk Communication and Community Engagement",
+        "coordination": "Program management and coordination",
+        "training": "Training and capacity development",
+        "delivery": "Service Delivery",
+        "logistics": "Logistics and Supply chain",
+        "monitoring_eval": "Monitoring and Evaluation (support supervision)",
+        "regulatory": "Regulatory and Oversight",
+        "surveillance": "Surveillance and EOC",
+        "data": "Data management"
+    }
 }

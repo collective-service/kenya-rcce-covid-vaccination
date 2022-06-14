@@ -192,7 +192,7 @@ function getSelectedFilters() {
 function getParentDetails(value) {
     const colFilter = displayBy == "activity" ? "Activity_desc" : "Partner";
     if (displayBy == "activity") {
-        return "Lorem ipsum dolor sit amet consectetur adipisicing elit";
+        return config.Activity_desc[value];
     }
     var detailArr;
     for (let index = 0; index < filteredMappingData.length; index++) {
@@ -209,7 +209,7 @@ function getParentDetails(value) {
 function getChildDetails(value) {
     const colFilter = displayBy == "activity" ? "Partner" : "Activity_desc";
     if (displayBy == "partner") {
-        return "Lorem ipsum dolor sit amet consectetur adipisicing elit";
+        return config.Activity_desc[value];
     }
     var detailArr;
     for (let index = 0; index < filteredMappingData.length; index++) {
@@ -568,7 +568,7 @@ function initiateMap() {
     // console.log(width)
     projection = d3.geoMercator()
         .center(mapCenter)
-        .scale(3700)
+        .scale(3900)
         .translate([width / 3.9, height / 2]);
     // .translate([-1000, -500]);
 
