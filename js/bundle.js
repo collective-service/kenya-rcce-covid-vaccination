@@ -9,6 +9,10 @@ let geomData,
 
 let parentsDefaultListArr = [],
     childrenDefaultListArr = [];
+
+let parentsDetails = [],
+    childrensDetails = [];
+
 let displayBy = "activity";
 
 let activitiesAllArr, maxAct;
@@ -31,13 +35,16 @@ $(document).ready(function() {
             mappingData = data[1];
             filteredMappingData = mappingData;
 
-            // console.log(filteredMappingData)
+
             setLastUpdatedDate();
 
             parentsDefaultListArr = uniqueValues("Activity");
             activitiesAllArr = uniqueValues("Activity");
             maxAct = activitiesAllArr.length;
             childrenDefaultListArr = uniqueValues("Partner_short");
+
+            parentsDetails = generatePanelDetailsArr();
+            childrensDetails = generatePanelDetailsArr("Partner_short", "Partner");
 
             // createMainFiltersTag("parentFilters", []);
             // createMainFiltersTag("childrenFilters", []);
@@ -54,6 +61,27 @@ $(document).ready(function() {
 
     getData();
 });
+
+function generatePanelDetailsArr(parent, child) {
+    const data = d3.nest()
+        .key(d => { return d[config[parent]]; })
+        .key(d => { return d[config[child]]; })
+        .rollup(d => { return d.length; })
+        .entries(mappingData);
+    var arr = [];
+    data.forEach(k => {
+        const tab = k.values;
+        arr.push({ key: k.key, value: tab[0].key });
+    });
+    // const act = un
+    if (parent == undefined) {
+        const vals = config.Activity_desc;
+        activitiesAllArr.forEach(element => {
+            arr.push({ key: element, value: vals[element] });
+        });
+    }
+    return arr;
+} //generatePanelDetailsArr
 
 $('#displayBySelect').on("change", function(d) {
     displayBy = $('#displayBySelect').val();
@@ -201,54 +229,62 @@ function getSelectedFilters() {
     return selections;
 } //getSelectedFilters
 
-function getParentDetails(value) {
-    const colFilter = displayBy == "activity" ? "Activity_desc" : "Partner";
-    if (displayBy == "activity") {
-        return config.Activity_desc[value];
-    }
-    var detailArr;
-    for (let index = 0; index < filteredMappingData.length; index++) {
-        const element = filteredMappingData[index];
-        if (element[config.Partner_short] == value) {
-            detailArr = element;
+function getPanelItemDetails(value) {
+    const array = displayBy == "activity" ? parentsDetails : childrensDetails;
+    var details;
+    for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        console.log(element)
+        if (element.key == value) {
+            details = element.value;
             break;
         }
     }
-    return detailArr[config[colFilter]];
+    return details;
+} //getPanelItemDetails
+
+function getParentDetails(value) {
+    const array = displayBy == "activity" ? parentsDetails : childrensDetails;
+    var details;
+    for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        if (element.key == value) {
+            details = element.value;
+            break;
+        }
+    }
+    return details;
 
 } //getParentDetails
 
 function getChildDetails(value) {
-    const colFilter = displayBy == "activity" ? "Partner" : "Activity_desc";
-    if (displayBy == "partner") {
-        return config.Activity_desc[value];
-    }
-    var detailArr;
-    for (let index = 0; index < filteredMappingData.length; index++) {
-        const element = filteredMappingData[index];
-        if (element[config.Partner_short] == value) {
-            detailArr = element;
+    const array = displayBy == "activity" ? childrensDetails : parentsDetails;
+    var details;
+    for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        if (element.key == value) {
+            details = element.value;
             break;
         }
     }
-    return detailArr[config[colFilter]];
+    return details;
 
 } //getChildDetails
 
 function createPanelListItems(arr = parentsDefaultListArr) {
     $(".collection-item").html('');
-
+    const hiddenClass = (!d3.select("#viewDetails").property("checked")) ? "hidden" : null;
     var lis = [];
     for (let index = 0; index < arr.length; index++) {
         const element = arr[index];
         const p = getParentDetails(element);
         lis += '<li>' +
-        '<div class="item">' +
-        '<h6>' + element + '</h6>' +
-        '<div class="contenu">' +
-        '<p>' + p + '</p>' +
-        '</div></div>' +
-        '</li>';
+            '<div class="item">' +
+            '<h6>' + element + '</h6>' +
+            '<div class="contenu ' + hiddenClass + '">' +
+            '<p>' + p + '</p>' +
+            '</div></div>' +
+            '</li>';
 
     }
     $(".collection-item").append(lis);
@@ -274,8 +310,8 @@ function createPanelListItems(arr = parentsDefaultListArr) {
 } //createPanelListItems
 
 function createChildrenPanel(arr = childrenDefaultListArr) {
-
     $(".children").html('');
+    const hiddenClass = (!d3.select("#viewDetails").property("checked")) ? "hidden" : null;
     var lis = [];
     for (let index = 0; index < arr.length; index++) {
         const element = arr[index];
@@ -284,7 +320,7 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
         lis += '<li>' +
             '<div class="item">' +
             '<h6>' + element + '</h6>' +
-            '<div class="contenu">' +
+            '<div class="contenu ' + hiddenClass + '">' +
             '<p>' + p + '</p>' +
             '</div>' +
             '</li>';
@@ -301,7 +337,7 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
         }
 
         updateDataFromFilters();
-        
+
         if (parentSelected.length == 0) {
             const parentsArr = getUpdatedParentArr();
             createPanelListItems(parentsArr);
@@ -313,6 +349,31 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
 
     });
 } //createChildrenPanel
+
+// on input change 
+
+$('#viewDetails').change(function() {
+    if (d3.select("#viewDetails").property("checked")) {
+        d3.select('.collection-item').selectAll("li")
+            .selectAll(".item")
+            .selectAll(".contenu")
+            .classed("hidden", false);
+
+        d3.select('.children').selectAll("li")
+            .selectAll(".item")
+            .selectAll(".contenu")
+            .classed("hidden", false);
+        return;
+    }
+    d3.select('.collection-item').selectAll("li")
+        .selectAll(".item")
+        .selectAll(".contenu")
+        .classed("hidden", true);
+    d3.select('.children').selectAll("li")
+        .selectAll(".item")
+        .selectAll(".contenu")
+        .classed("hidden", true);
+});
 
 // get each item p value
 function getItemsDetails(whoCalled = "parent", item) {
@@ -428,14 +489,14 @@ function updateDataFromFilters() {
 
     if (parentItemSelection.length > 0) {
         const colFilter = displayBy == "activity" ? "Activity" : "Partner_short";
-        data = data.filter(function(d){
+        data = data.filter(function(d) {
             return parentItemSelection.includes(d[config[colFilter]]);
         })
 
     }
     if (childrenItemSelection.length > 0) {
         const colFilter = displayBy == "activity" ? "Partner_short" : "Activity";
-        data = data.filter(function(d){
+        data = data.filter(function(d) {
             return childrenItemSelection.includes(d[config[colFilter]]);
         });
 
@@ -453,36 +514,38 @@ function updateDataFromFilters() {
 const targetMinColor = "red",
     targetMaxcolor = "white";
 
-function getCountyReport(county){
+function getCountyReport(county) {
+    $("#countyReport").html('');
+
     const divs = '<div id="graphes"><p>Activity Gap</p><div id="gauge"></div>';
-    $('#countyReport').append(divs+'</div>');
-   
-    const filter = mappingData.filter(function(d){ 
+    $('#countyReport').append(divs + '</div>');
+
+    const filter = mappingData.filter(function(d) {
         return d[config["ISO3"]] == county;
     });
     const countyAct = uniqueValues("Activity", filter);
     var missingAct = [];
     for (let index = 0; index < activitiesAllArr.length; index++) {
         const element = activitiesAllArr[index];
-        !countyAct.includes(element) ? missingAct.push(element): null;
+        !countyAct.includes(element) ? missingAct.push(element) : null;
 
     }
     const gaugeChart = generateGauge(countyAct);
-    if (missingAct.length >0) {
+    if (missingAct.length > 0) {
         var spans = '';
         for (let index = 0; index < missingAct.length; index++) {
             const element = missingAct[index];
-            spans +='<span>'+element+'</span>';
+            spans += '<span>' + element + '</span>';
         }
-        const missingActDiv = '<div class="missing"><p>Missing activities</p>'+spans+'</div>';
+        const missingActDiv = '<div class="missing"><p>Missing activities</p>' + spans + '</div>';
         $('#graphes').append(missingActDiv);
     }
 
 
-}//getCountyReport
+} //getCountyReport
 
-function generateGauge(arr){
-    const val =arr.length;
+function generateGauge(arr) {
+    const val = arr.length;
     var chart = c3.generate({
         bindto: '#gauge',
         data: {
@@ -497,17 +560,17 @@ function generateGauge(arr){
         gauge: {
             label: {
                 format: function(value, ratio) {
-                    return val +"/"+maxAct;//d3.format('d')(value);
+                    return val + "/" + maxAct; //d3.format('d')(value);
                 },
-    //            show: false // to turn off the min/max labels.
+                //            show: false // to turn off the min/max labels.
             },
-        min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
-        max: maxAct, // 100 is default
-        units: '',
-    //    width: 39 // for adjusting arc thickness
+            min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
+            max: maxAct, // 100 is default
+            units: '',
+            //    width: 39 // for adjusting arc thickness
         },
         color: {
-            pattern: ['#FF0000', '#F97600', '#F6C600', '#2F9C67'],//, '#60B044'], // the three color levels for the percentage values.
+            pattern: ['#FF0000', '#F97600', '#F6C600', '#2F9C67'], //, '#60B044'], // the three color levels for the percentage values.
             threshold: {
                 unit: 'value', // percentage is default
                 max: maxAct, // 100 is default
@@ -517,26 +580,27 @@ function generateGauge(arr){
         size: {
             height: 100
         },
-        legend:{
+        legend: {
             show: false
         },
-        tooltip:{
-            show:false
+        tooltip: {
+            show: false
         }
     })
     return chart;
 }
 
 function setMetricsPanels(data = filteredMappingData) {
-    // const countryOrActArr = countrySelectedFromMap =="" ? uniqueValues("ISO3", data) : uniqueValues("Activity", data);
+    // if (countrySelectedFromMap != "") {
+    //     $("#countyReport").html('');
+    // }
     const countriesArr = uniqueValues("ISO3", data);
     const orgsArr = uniqueValues("Partner_short", data);
 
     //overall
     d3.select('.keyFigures').select('#number1').text(orgsArr.length);
     d3.select('.keyFigures').select('#number2').text(countriesArr.length);
-    //clean county report if map not selected
-    $("#countyReport").html('');
+
 
     //target population
     // const targetArr = getColumnUniqueValues("Target", data);
@@ -612,7 +676,6 @@ function getUpdatedParentArr(data) {
 function updateViz(data) {
     const parentsArr = getUpdatedParentArr(data);
     const childrenArr = getUpdatedChildrenArr(data);
-
     createPanelListItems(parentsArr);
     createChildrenPanel(childrenArr);
 
@@ -793,16 +856,16 @@ function createMapLabels(data = filteredMappingData) {
         .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
         .attr("dy", ".35em")
         .text(function(d) { return d.properties.ADM1_EN; })
-        .on("click", function(d){
-            
+        .on("click", function(d) {
+
             mapsvg.select('g').selectAll('.hasData').attr('fill', mapNotClickedColor);
-            mapsvg.select('g').selectAll('.hasData').each(function(f){
+            mapsvg.select('g').selectAll('.hasData').each(function(f) {
                 if (d.properties.ADM1_PCODE == f.properties.ADM1_PCODE) {
                     d3.select(this).transition().duration(500).attr('fill', mapClickedColor);
-                    d3.select(this).classed("clicked",true);
+                    d3.select(this).classed("clicked", true);
                 }
             })
- 
+
             countrySelectedFromMap = d.properties.ADM1_PCODE;
             const mapData = mappingData.filter(e => { return e[config["ISO3"]] == d.properties.ADM1_PCODE; });
             updateVizFromMap(mapData);

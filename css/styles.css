@@ -90,6 +90,16 @@ h5 {
     padding: 8px;
 }
 
+.view-details label {
+    display: flex;
+    padding: 0 10px;
+}
+
+.view-details label input {
+    margin: 3px;
+}
+
+
 /* .contentPanel .content main {
     overflow-y: auto;
 } */
@@ -109,10 +119,11 @@ h5 {
     width: 200px;
 }
 
-.item-list{
+.item-list {
     height: auto;
     overflow-y: auto;
 }
+
 .leftPanel section {
     position: relative;
     margin-top: 15px;
@@ -154,7 +165,12 @@ ul {
 .item p {
     color: #838383;
 }
-.mainContent{
+
+.item .hidden {
+    display: none;
+}
+
+.mainContent {
     height: auto;
     overflow-y: auto;
 }
@@ -396,19 +412,20 @@ svg g path path.inactive {
     padding: 5px 0;
 }
 
-#graphes p{
+#graphes p {
     margin: 5px 0;
     font-size: 14px;
     font-weight: 200;
     /* color: #838383; */
 }
+
 .c3 {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.missing span{
+.missing span {
     /* margin: 5px; */
     background: #ee5348;
     border: 1px solid #e6e6e6;
@@ -423,6 +440,8 @@ svg g path path.inactive {
     font-size: 10px;
     font-weight: 200;
 }
+
+
 /* @media only screen and (max-width: 767px) {
     .main .rightSide {
         width: 120px;
