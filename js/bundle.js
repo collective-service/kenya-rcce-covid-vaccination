@@ -233,17 +233,19 @@ function getChildDetails(value) {
 
 function createPanelListItems(arr = parentsDefaultListArr) {
     $(".collection-item").html('');
+
     var lis = [];
     for (let index = 0; index < arr.length; index++) {
         const element = arr[index];
         const p = getParentDetails(element);
         lis += '<li>' +
-            '<div class="item">' +
-            '<h6>' + element + '</h6>' +
-            '<div class="contenu">' +
-            '<p>' + p + '</p>' +
-            '</div></div>' +
-            '</li>';
+        '<div class="item">' +
+        '<h6>' + element + '</h6>' +
+        '<div class="contenu">' +
+        '<p>' + p + '</p>' +
+        '</div></div>' +
+        '</li>';
+
     }
     $(".collection-item").append(lis);
 
@@ -286,6 +288,7 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
     $(".children").append(lis);
 
     $(".children li").on("click", function(d) {
+        const parentSelected = getSelectedItemFromUl("collection-item");
         const isSelected = $(this).hasClass('is-selected');
         if (!isSelected) {
             $(this).addClass('is-selected');
@@ -294,9 +297,11 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
         }
 
         updateDataFromFilters();
-        const parentsArr = getUpdatedParentArr();
-        // console.log(childrenArr)
-        createPanelListItems(parentsArr);
+        
+        if (parentSelected.length == 0) {
+            const parentsArr = getUpdatedParentArr();
+            createPanelListItems(parentsArr);
+        }
 
         choroplethMap();
         setMetricsPanels();
@@ -418,25 +423,18 @@ function updateDataFromFilters() {
     }
 
     if (parentItemSelection.length > 0) {
-
-        data = data.filter(function(d) {
-            if (displayBy == "activity") {
-                const vals = splitMultiValues(d[config.Activity]);
-                return findOneValue(parentItemSelection, vals);
-            }
-            return parentItemSelection.includes(d[config.Partner_short]);
+        const colFilter = displayBy == "activity" ? "Activity" : "Partner_short";
+        data = data.filter(function(d){
+            return parentItemSelection.includes(d[config[colFilter]]);
         })
+
     }
     if (childrenItemSelection.length > 0) {
         const colFilter = displayBy == "activity" ? "Partner_short" : "Activity";
-        data = data.filter(function(d) {
-            // children = activities
-            if (displayBy != "activity") {
-                const vals = splitMultiValues(d[config.Activity]);
-                return findOneValue(childrenItemSelection, vals);
-            }
+        data = data.filter(function(d){
             return childrenItemSelection.includes(d[config[colFilter]]);
-        })
+        });
+
     }
 
     if (countrySelectedFromMap != "") {
@@ -452,8 +450,10 @@ const targetMinColor = "red",
     targetMaxcolor = "white";
 
 function setMetricsPanels(data = filteredMappingData) {
+    // const countryOrActArr = countrySelectedFromMap =="" ? uniqueValues("ISO3", data) : uniqueValues("Activity", data);
     const countriesArr = uniqueValues("ISO3", data);
-    const orgsArr = uniqueValues("Partner", data);
+    const orgsArr = uniqueValues("Partner_short", data);
+
     //overall
     d3.select('.keyFigures').select('#number1').text(orgsArr.length);
     d3.select('.keyFigures').select('#number2').text(countriesArr.length);

@@ -31,60 +31,54 @@
                         <p class="text-accroche">Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore iusto sed voluptate tenetur et maiores assumenda, quaerat accusantium ipsam ad dolorum suscipit eius officia corrupti mollitia.</p>
                         <p class="source" id="date_updated">Data as of 10/06/2022</p>
                     </header>
+                    <section>
+                        <div class="dropdown flexCol">
+                            <h6 id="h6Fix"><label for="">Display by</label></h6>
+                            <select id="displayBySelect">
+                                <option value="activity" selected>Activity</option>
+                                <option value="partner">Partner</option>
+                            </select>
+                        </div>
+                    </section>
+                    <section>
+                        <div class="content parent">
+                            <h6 id="h6Fix">Activities</h6>
+                            <div class="item-selections">
+                                <button class="select-reset">Clear selection</button>
+                            </div>
+                        </div>
+                    </section>
+
                     <div class="item-list">
-                        <section>
-                            <div class="dropdown flexCol">
-                                <h6 id="h6Fix"><label for="">Display by</label></h6>
-                                <select id="displayBySelect">
-                                    <option value="activity" selected>Activity</option>
-                                    <option value="partner">Partner</option>
-                                    <!-- <option value="location">Location</option> -->
-                                </select>
-                            </div>
-                        </section>
-                        <!-- <section>
-                            <div class="main-filters">
-                                <div class="parentFilters"></div>
-                            </div>
-                        </section> -->
-                        <section>
-                            <div class="content parent">
-                                <h6 id="h6Fix">Activities</h6>
-                                <div class="item-selections">
-                                    <button class="select-reset">Clear selection</button>
-                                    <!-- <button class="select-all">Select all</button> -->
-                                </div>
-                                <main>
-                                    <ul class="collection-item"></ul>
-                                </main>
-
-                            </div>
-                        </section>
+                        <div class="content parent">
+                            <main>
+                                <ul class="collection-item"></ul>
+                            </main>
+                        </div>
                     </div>
-
                 </div>
-                <div class="contentPanel" id="contentPanel">
-                    <div class="content flexCol child">
+                <div class="contentPanel flexCol" id="contentPanel">
+                    <header>
                         <h6 id="h6Fix">Partners</h6>
-                        <section>
-                            <div class="second-filters">
-                                <div class="childrenFilters"></div>
-                            </div>
-                        </section>
+                        <div class="second-filters">
+                            <div class="childrenFilters"></div>
+                        </div>
+                    </header>
+                    <section>
+
                         <div class="children-selections">
                             <button class="select-reset">Clear selection</button>
-                            <!-- <button class="select-all">Select all</button> -->
                         </div>
+                    </section>
 
-                        <section>
-                            <div class="mainContent">
-                                <main>
-                                    <ul class="children"></ul>
-                                </main>
-
-                            </div>
-                        </section>
+                    <div class="mainContent">
+                        <div class="childrenContent">
+                            <main>
+                                <ul class="children"></ul>
+                            </main>
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="map">
