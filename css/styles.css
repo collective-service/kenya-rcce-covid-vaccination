@@ -271,7 +271,8 @@ ul {
     outline: 0;
 }
 
-#map .hasData {
+#map .hasData,
+#map .country-label {
     cursor: pointer;
 }
 
@@ -347,6 +348,7 @@ svg g path path.inactive {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .keyFigures .figure .number {
@@ -394,7 +396,33 @@ svg g path path.inactive {
     padding: 5px 0;
 }
 
+#graphes p{
+    margin: 5px 0;
+    font-size: 14px;
+    font-weight: 200;
+    /* color: #838383; */
+}
+.c3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.missing span{
+    /* margin: 5px; */
+    background: #ee5348;
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
+    padding: 5px;
+    /* display: inline-block; */
+    box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+    /* cursor: pointer; */
+    text-transform: uppercase;
+    /* color: #838383; */
+    color: #fff;
+    font-size: 10px;
+    font-weight: 200;
+}
 /* @media only screen and (max-width: 767px) {
     .main .rightSide {
         width: 120px;

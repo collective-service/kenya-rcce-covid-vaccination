@@ -11,6 +11,8 @@ let parentsDefaultListArr = [],
     childrenDefaultListArr = [];
 let displayBy = "activity";
 
+let activitiesAllArr, maxAct;
+
 $(document).ready(function() {
     function getData() {
         Promise.all([
@@ -32,7 +34,9 @@ $(document).ready(function() {
             // console.log(filteredMappingData)
             setLastUpdatedDate();
 
-            parentsDefaultListArr = getColumnUniqueValues("Activity");
+            parentsDefaultListArr = uniqueValues("Activity");
+            activitiesAllArr = uniqueValues("Activity");
+            maxAct = activitiesAllArr.length;
             childrenDefaultListArr = uniqueValues("Partner_short");
 
             // createMainFiltersTag("parentFilters", []);
@@ -449,6 +453,80 @@ function updateDataFromFilters() {
 const targetMinColor = "red",
     targetMaxcolor = "white";
 
+function getCountyReport(county){
+    const divs = '<div id="graphes"><p>Activity Gap</p><div id="gauge"></div>';
+    $('#countyReport').append(divs+'</div>');
+   
+    const filter = mappingData.filter(function(d){ 
+        return d[config["ISO3"]] == county;
+    });
+    const countyAct = uniqueValues("Activity", filter);
+    var missingAct = [];
+    for (let index = 0; index < activitiesAllArr.length; index++) {
+        const element = activitiesAllArr[index];
+        !countyAct.includes(element) ? missingAct.push(element): null;
+
+    }
+    const gaugeChart = generateGauge(countyAct);
+    if (missingAct.length >0) {
+        var spans = '';
+        for (let index = 0; index < missingAct.length; index++) {
+            const element = missingAct[index];
+            spans +='<span>'+element+'</span>';
+        }
+        const missingActDiv = '<div class="missing"><p>Missing activities</p>'+spans+'</div>';
+        $('#graphes').append(missingActDiv);
+    }
+
+
+}//getCountyReport
+
+function generateGauge(arr){
+    const val =arr.length;
+    var chart = c3.generate({
+        bindto: '#gauge',
+        data: {
+            columns: [
+                ['data', val]
+            ],
+            type: 'gauge',
+            // onclick: function (d, i) { console.log("onclick", d, i); },
+            // onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+            // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+        },
+        gauge: {
+            label: {
+                format: function(value, ratio) {
+                    return val +"/"+maxAct;//d3.format('d')(value);
+                },
+    //            show: false // to turn off the min/max labels.
+            },
+        min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
+        max: maxAct, // 100 is default
+        units: '',
+    //    width: 39 // for adjusting arc thickness
+        },
+        color: {
+            pattern: ['#FF0000', '#F97600', '#F6C600', '#2F9C67'],//, '#60B044'], // the three color levels for the percentage values.
+            threshold: {
+                unit: 'value', // percentage is default
+                max: maxAct, // 100 is default
+                values: [3, 5, 9]
+            }
+        },
+        size: {
+            height: 100
+        },
+        legend:{
+            show: false
+        },
+        tooltip:{
+            show:false
+        }
+    })
+    return chart;
+}
+
 function setMetricsPanels(data = filteredMappingData) {
     // const countryOrActArr = countrySelectedFromMap =="" ? uniqueValues("ISO3", data) : uniqueValues("Activity", data);
     const countriesArr = uniqueValues("ISO3", data);
@@ -457,6 +535,8 @@ function setMetricsPanels(data = filteredMappingData) {
     //overall
     d3.select('.keyFigures').select('#number1').text(orgsArr.length);
     d3.select('.keyFigures').select('#number2').text(countriesArr.length);
+    //clean county report if map not selected
+    $("#countyReport").html('');
 
     //target population
     // const targetArr = getColumnUniqueValues("Target", data);
@@ -580,7 +660,6 @@ function initiateMap() {
     const mapZoomSize = width <= 503 ? 2500 : 3900;
     var mapScale = (isMobile) ? 2500 : mapZoomSize; //width * 8.5;
     var mapCenter = (isMobile) ? [12, 12] : mapPosition;
-    console.log(width)
     projection = d3.geoMercator()
         .center(mapCenter)
         .scale(mapScale)
@@ -626,16 +705,8 @@ function initiateMap() {
             const mapData = mappingData.filter(e => { return e[config["ISO3"]] == d.properties.ADM1_PCODE; });
             updateVizFromMap(mapData);
             createMapFilterSpan(d.properties.ADM1_EN);
+            getCountyReport(d.properties.ADM1_PCODE);
         });
-
-    //country labels
-    // g.selectAll(".country-label")
-    //     .data(geomData.features)
-    //     .enter().append("text")
-    //     .attr("class", "country-label")
-    //     .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
-    //     .attr("dy", ".35em")
-    //     .text(function(d) { return d.properties.ADM1_EN; });
 
     choroplethMap();
 
@@ -721,7 +792,23 @@ function createMapLabels(data = filteredMappingData) {
         .attr("class", "country-label")
         .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
         .attr("dy", ".35em")
-        .text(function(d) { return d.properties.ADM1_EN; });
+        .text(function(d) { return d.properties.ADM1_EN; })
+        .on("click", function(d){
+            
+            mapsvg.select('g').selectAll('.hasData').attr('fill', mapNotClickedColor);
+            mapsvg.select('g').selectAll('.hasData').each(function(f){
+                if (d.properties.ADM1_PCODE == f.properties.ADM1_PCODE) {
+                    d3.select(this).transition().duration(500).attr('fill', mapClickedColor);
+                    d3.select(this).classed("clicked",true);
+                }
+            })
+ 
+            countrySelectedFromMap = d.properties.ADM1_PCODE;
+            const mapData = mappingData.filter(e => { return e[config["ISO3"]] == d.properties.ADM1_PCODE; });
+            updateVizFromMap(mapData);
+            createMapFilterSpan(d.properties.ADM1_EN);
+            getCountyReport(d.properties.ADM1_PCODE);
+        });
 
 } //createMapLabels
 
