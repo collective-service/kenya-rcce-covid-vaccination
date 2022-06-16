@@ -290,7 +290,7 @@ function createPanelListItems(arr = parentsDefaultListArr) {
     $(".collection-item").append(lis);
 
     $(".collection-item li").on("click", function(d) {
-        const parentSelection = getSelectedItemFromUl("collection-item");
+        // const parentSelection = getSelectedItemFromUl("collection-item");
         const isSelected = $(this).hasClass('is-selected');
         if (!isSelected) {
             $(this).addClass('is-selected');
@@ -765,7 +765,7 @@ function initiateMap() {
         .attr('stroke', '#fff')
         .on("click", function(d) {
             mapsvg.select('g').selectAll('.hasData')
-                .transition().duration(500)
+                // .transition().duration(500)
                 .attr('fill', mapNotClickedColor);
             $(this).attr('fill', mapClickedColor);
             $(this).addClass('clicked');
