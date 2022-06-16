@@ -1,11 +1,14 @@
 //BRR
-let geodataUrl = 'data/ken_counties.json';
-let fourWDataUrl = 'data/data.csv';
-let configFileURL = 'data/config.json';
+const geodataUrl = 'data/ken_counties.json';
+const fourWDataUrl = 'data/data.csv';
+const configFileURL = 'data/config.json';
+const vaxURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzl-1-YKB83rASc_f9s6xKYUY9PjMKQW1uQzbP50BcaPL2xvGovG9Y17xHt_GxSNBdJRJY-Qdhon9X/pub?gid=0&single=true&output=csv";
+
 let geomData,
     mappingData,
     filteredMappingData,
-    config;
+    config,
+    vaccinationData;
 
 let parentsDefaultListArr = [],
     childrenDefaultListArr = [];
@@ -22,7 +25,8 @@ $(document).ready(function() {
         Promise.all([
             d3.json(geodataUrl),
             d3.csv(fourWDataUrl),
-            d3.json(configFileURL)
+            d3.json(configFileURL),
+            d3.csv(vaxURL)
         ]).then(function(data) {
             geomData = topojson.feature(data[0], data[0].objects.kenya_counties);
             // console.log(geomData)
@@ -34,7 +38,7 @@ $(document).ready(function() {
             });
             mappingData = data[1];
             filteredMappingData = mappingData;
-
+            vaccinationData = data[3];
 
             setLastUpdatedDate();
 
@@ -104,6 +108,8 @@ function resetToDefault() {
 
     // createMapFilterSpan();
     $(".map-filter").html("");
+    // county report
+    $("#countyReport").html('');
 
     const listParentTitle = displayBy == "activity" ? "Activities" : "Partners";
     const listChildTitle = displayBy == "activity" ? "Partners" : "Activities";
@@ -519,9 +525,28 @@ const targetMinColor = "red",
 
 function getCountyReport(county) {
     $("#countyReport").html('');
+    var countyVax = "N/A",
+        vaxSourceDate = "N/A";
+    for (let index = 0; index < vaccinationData.length; index++) {
+        const element = vaccinationData[index];
+        if (element[config.vaccination.county_code] == county) {
+            element[config.vaccination.percentage] != "" ? countyVax = element[config.vaccination.percentage] : null;
+            element[config.vaccination.source_date] != "" ? vaxSourceDate = element[config.vaccination.source_date] : null;
+            break;
+        }
+    }
 
-    const divs = '<div id="graphes"><p>Activity Gap</p><div id="gauge"></div>';
-    $('#countyReport').append(divs + '</div>');
+    var divVax = '<div class="vax"><header>Vaccination</header>' +
+        '<div class="vax-block"><p id="vax-pct">' + countyVax + '</p><p>fully vaccinated<p></div>';
+
+    if (vaxSourceDate != "N/A") {
+        divVax += '<div> <p class="vax-source">Source: MoH, ' + vaxSourceDate + '</p></div></div>';
+    } else divVax += '</div>';
+
+    const divs = '<div id="graphes">' + divVax + '<header>Activity coverage</header><div id="gauge"></div></div>';
+    $('#countyReport').append(divs);
+
+    d3.select("#vax-pct").style("background", "#ef6666");
 
     const filter = mappingData.filter(function(d) {
         return d[config["ISO3"]] == county;
@@ -534,17 +559,16 @@ function getCountyReport(county) {
 
     }
     const gaugeChart = generateGauge(countyAct);
+    var spans = '<p class="clearPadding">None</p>';
     if (missingAct.length > 0) {
-        var spans = '';
+        spans = '';
         for (let index = 0; index < missingAct.length; index++) {
             const element = missingAct[index];
             spans += '<span>' + element + '</span>';
         }
-        const missingActDiv = '<div class="missing"><p>Missing activities</p>' + spans + '</div>';
-        $('#graphes').append(missingActDiv);
     }
-
-
+    const missingActDiv = '<div class="missing"><header>Gap</header>' + spans + '</div>';
+    $('#graphes').append(missingActDiv);
 } //getCountyReport
 
 function generateGauge(arr) {
@@ -555,22 +579,19 @@ function generateGauge(arr) {
             columns: [
                 ['data', val]
             ],
-            type: 'gauge',
-            // onclick: function (d, i) { console.log("onclick", d, i); },
-            // onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-            // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+            type: 'gauge'
         },
         gauge: {
             label: {
                 format: function(value, ratio) {
-                    return val + "/" + maxAct; //d3.format('d')(value);
+                    return val + "/" + maxAct;
                 },
-                //            show: false // to turn off the min/max labels.
+                show: false // to turn off the min/max labels.
             },
             min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
             max: maxAct, // 100 is default
             units: '',
-            //    width: 39 // for adjusting arc thickness
+            width: 19 // for adjusting arc thickness
         },
         color: {
             pattern: ['#FF0000', '#F97600', '#F6C600', '#2F9C67'], //, '#60B044'], // the three color levels for the percentage values.
@@ -594,9 +615,7 @@ function generateGauge(arr) {
 }
 
 function setMetricsPanels(data = filteredMappingData) {
-    // if (countrySelectedFromMap != "") {
-    //     $("#countyReport").html('');
-    // }
+
     const countriesArr = uniqueValues("ISO3", data);
     const orgsArr = uniqueValues("Partner_short", data);
 
@@ -710,7 +729,7 @@ let mapFillColor = '#204669', //'#C2DACA',//'#2F9C67',
     mapActive = '#D90368',
     hoverColor = '#D90368',
     mapNotClickedColor = "#E9F1EA",
-    mapClickedColor = "#f0473a";
+    mapClickedColor = '#ef6666'; //"#f0473a";
 let countrySelectedFromMap = "";
 // let mapColorRange = ['#fdebe9', '#fac2bd', '#f79992', '#f37066']; //, '#f0473a'];
 let mapColorRange = ['#E9F1EA', '#C2DACA', '#9EC8AE', '#78B794', '#2F9C67'];

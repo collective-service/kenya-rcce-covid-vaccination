@@ -21,5 +21,10 @@
         "regulatory": "Regulatory and Oversight",
         "surveillance": "Surveillance and EOC",
         "data": "Data management"
+    },
+    "vaccination": {
+        "county_code": "County_code",
+        "percentage": "% fully vaccinated",
+        "source_date": "Source Date"
     }
 }
