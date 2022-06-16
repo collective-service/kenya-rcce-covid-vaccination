@@ -290,6 +290,7 @@ function createPanelListItems(arr = parentsDefaultListArr) {
     $(".collection-item").append(lis);
 
     $(".collection-item li").on("click", function(d) {
+        const parentSelection = getSelectedItemFromUl("collection-item");
         const isSelected = $(this).hasClass('is-selected');
         if (!isSelected) {
             $(this).addClass('is-selected');
@@ -297,6 +298,8 @@ function createPanelListItems(arr = parentsDefaultListArr) {
             $(this).removeClass('is-selected');
         }
         // remove children selection
+        //if a child was selected -> parent is filtered out, so should reinit parent arr but keep selection
+        // console.log(parentSelection);
         d3.select(".children").selectAll("li").classed("is-selected", false);
 
         updateDataFromFilters();
@@ -719,7 +722,7 @@ function initiateMap() {
     width = viewportWidth - 560 - document.getElementById("rightSide").offsetWidth;
     // height = (isMobile) ? 400 : 500;
     height = 90;
-    const mapPosition = width <= 503 ? [35.3, 7.5] : [33.5, 6.5];
+    const mapPosition = width <= 503 ? [35.3, 7.5] : [33.5, 5.7];
     const mapZoomSize = width <= 503 ? 2500 : 3900;
     var mapScale = (isMobile) ? 2500 : mapZoomSize; //width * 8.5;
     var mapCenter = (isMobile) ? [12, 12] : mapPosition;
@@ -761,7 +764,9 @@ function initiateMap() {
         .attr('stroke-width', .7)
         .attr('stroke', '#fff')
         .on("click", function(d) {
-            mapsvg.select('g').selectAll('.hasData').attr('fill', mapNotClickedColor);
+            mapsvg.select('g').selectAll('.hasData')
+                .transition().duration(500)
+                .attr('fill', mapNotClickedColor);
             $(this).attr('fill', mapClickedColor);
             $(this).addClass('clicked');
             countrySelectedFromMap = d.properties.ADM1_PCODE;
