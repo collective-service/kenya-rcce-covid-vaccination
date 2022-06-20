@@ -93,13 +93,20 @@
                 </div>
 
                 <div class="map">
-                    <!-- <div class="map-filter"></div> -->
+                    <div class="map-title">
+                        <h6># of partners per county</h6>
+                        <div class="map-filter"></div>
+                        <div class="map-toggle">
+                            <label for="orgs"><input type="radio" name="map-toggle" id="orgs" checked>Partners map</label>
+                            <label for="vax"><input type="radio" name="map-toggle" id="vax">Vaccination map</label>
+                        </div>
+                    </div>
                     <div id="map">
                         <div class="zoom-controls">
                             <button id="zoom_in">+</button>
                             <button id="zoom_out">-</button>
                         </div>
-                        <div class="map-filter"></div>
+                        <!-- <div class="map-filter"></div> -->
                         <div class="legend"></div>
                     </div>
                 </div>

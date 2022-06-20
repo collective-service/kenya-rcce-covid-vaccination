@@ -295,24 +295,55 @@ ul {
 }
 
 svg g path path.inactive {
-    cursor: default;
+    /* cursor: default; */
+    pointer-events: none;
 }
 
 .map-filter {
     display: flex;
     gap: 15px;
-    padding: 10px 8px;
-    justify-content: center;
-    align-items: center;
+    /* padding: 10px 8px; */
+    /* justify-content: center; */
+    /* align-items: center; */
 }
 
 .map-filter button,
 .map-filter span {
     text-transform: uppercase;
     color: #838383;
-    font-size: 1rem;
+    font-size: .9rem;
     font-weight: 400;
-    padding: 0 10px;
+    /* padding: 0 10px; */
+}
+
+.d3-tip {
+    padding: 10px;
+    background-color: #fff;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border: 0px;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #000;
+    transition: 0.3s opacity ease;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.d3-tip h5 {
+    font-size: 15px;
+}
+
+.d3-tip ul {
+    margin: 0;
+}
+
+.map-tip {
+    position: absolute;
+}
+
+.hidden {
+    display: none;
 }
 
 .map-filter button {
@@ -321,11 +352,35 @@ svg g path path.inactive {
     border: none;
     cursor: pointer;
     color: #1c99f2;
-    font-size: 11px;
+    /* font-size: 11px; */
+    height: 10px;
 }
 
 .map-filter span {
     color: #ef6666;
+}
+
+.map-title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.map-toggle label {
+    display: flex;
+}
+
+.map-toggle input {
+    margin: 3px 5px 0 0;
+}
+
+.map-title h6 {
+    font-size: .9rem;
+    text-transform: uppercase;
+}
+
+.map-toggle {
+    display: flex;
+    flex-direction: column;
 }
 
 .legend {

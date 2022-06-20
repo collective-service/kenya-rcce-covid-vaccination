@@ -17,6 +17,7 @@ let parentsDetails = [],
     childrensDetails = [];
 
 let displayBy = "activity";
+let mapType = "orgs";
 
 let activitiesAllArr, maxAct;
 
@@ -89,7 +90,8 @@ function generatePanelDetailsArr(parent, child) {
 
 $('#displayBySelect').on("change", function(d) {
     displayBy = $('#displayBySelect').val();
-
+    d3.select("#orgs").property("checked", true)
+    mapType = "orgs";
     resetToDefault();
 
     //update map and metrics
@@ -384,6 +386,20 @@ $('#viewDetails').change(function() {
         .classed("hidden", true);
 });
 
+$('input[type=radio][name="map-toggle"]').on("change", function(d) {
+    if (d3.select("#orgs").property("checked")) {
+        mapType = "orgs";
+        d3.select(".map-title h6").text("# of partners per county");
+    }
+    if (d3.select("#vax").property("checked")) {
+        mapType = "vax";
+        d3.select(".map-title h6").text("% of people fully vaccinated");
+    }
+
+    // choroplethMap();
+    resetToDefault();
+});
+
 // get each item p value
 function getItemsDetails(whoCalled = "parent", item) {
     var p = "Lorem ipsum dolor sit amet consectetur adipisicing elit";
@@ -518,7 +534,9 @@ function updateDataFromFilters() {
     return;
 } //updateDataFromFilters
 
-// metrics 
+// metrics  
+// const vaxColorRange = ['#FF0000', '#F97600', '#F6C600', '#2F9C67'];
+const vaxColorRange = ['#f0473a', '#F97600', '#F6C600', '#2F9C67'];
 
 const targetMinColor = "red",
     targetMaxcolor = "white";
@@ -544,8 +562,6 @@ function getCountyReport(county) {
     if (vaxSourceDate != "N/A") {
         divVax += '<div> <p class="vax-source">Source: MoH, ' + vaxSourceDate + '</p></div></div>';
     } else divVax += '</div>';
-
-
 
     const divs = '<div id="graphes">' + divVax +
         '<header>Activity coverage</header><div class="score"><p id="score">6/9</p></div></div>';
@@ -611,11 +627,11 @@ function createVaxChart(vax) {
             width: 20 // for adjusting arc thickness
         },
         color: {
-            pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'], // the three color levels for the percentage values.
+            pattern: vaxColorRange, //['#FF0000', '#F97600', '#F6C600', '#2F9C67'],
             threshold: {
                 //            unit: 'value', // percentage is default
                 //            max: 200, // 100 is default
-                values: [30, 60, 90, 100]
+                values: [25, 50, 90, 75]
             }
         },
         size: {
@@ -631,48 +647,6 @@ function createVaxChart(vax) {
     return chart;
 }
 
-function generateGauge(arr) {
-    const val = arr.length;
-    var chart = c3.generate({
-        bindto: '#gauge',
-        data: {
-            columns: [
-                ['data', val]
-            ],
-            type: 'gauge'
-        },
-        gauge: {
-            label: {
-                format: function(value, ratio) {
-                    return val + "/" + maxAct;
-                },
-                show: false // to turn off the min/max labels.
-            },
-            min: 0, // 0 is default, //can handle negative min e.g. vacuum / voltage / current flow / rate of change
-            max: maxAct, // 100 is default
-            units: '',
-            width: 19 // for adjusting arc thickness
-        },
-        color: {
-            pattern: ['#FF0000', '#F97600', '#F6C600', '#2F9C67'], //, '#60B044'], // the three color levels for the percentage values.
-            threshold: {
-                unit: 'value', // percentage is default
-                max: maxAct, // 100 is default
-                values: [3, 5, 9]
-            }
-        },
-        size: {
-            height: 100
-        },
-        legend: {
-            show: false
-        },
-        tooltip: {
-            show: false
-        }
-    })
-    return chart;
-}
 
 function setMetricsPanels(data = filteredMappingData) {
 
@@ -781,7 +755,7 @@ function updateVizFromMap(data) {
 // map js
 let isMobile = $(window).width() < 767 ? true : false;
 let countriesArr = [];
-let g, mapsvg, projection, width, height, zoom, path;
+let g, mapsvg, projection, width, height, zoom, path, maptip;
 let viewportWidth = window.innerWidth;
 let currentZoom = 1;
 let mapFillColor = '#204669', //'#C2DACA',//'#2F9C67', 
@@ -830,7 +804,7 @@ function initiateMap() {
         .attr("fill", "#fff");
 
     //map tooltips
-    var maptip = d3.select('#map').append('div').attr('class', 'd3-tip map-tip hidden');
+    maptip = d3.select('#map').append('div').attr('class', 'd3-tip map-tip hidden');
 
     const countriesISO3Arr = uniqueValues("ISO3");
     g = mapsvg.append("g");
@@ -844,6 +818,10 @@ function initiateMap() {
         .attr('stroke-width', .7)
         .attr('stroke', '#fff')
         .on("click", function(d) {
+            // fix inactive but clickage bug
+            if (d3.select(this).classed("inactive")) {
+                return;
+            }
             mapsvg.select('g').selectAll('.hasData')
                 // .transition().duration(500)
                 .attr('fill', mapNotClickedColor);
@@ -854,6 +832,25 @@ function initiateMap() {
             updateVizFromMap(mapData);
             createMapFilterSpan(d.properties.ADM1_EN);
             getCountyReport(d.properties.ADM1_PCODE);
+        })
+        .on("mouseenter", function(d) {
+            if (mapType == "vax") {
+                if (d3.select(this).classed("hasData")) {
+                    const filter = vaccinationData.filter(v => { return v[config.vaccination.county_code] == d.properties.ADM1_PCODE });
+                    const html = d.properties.ADM1_EN +
+                        "</br>" +
+                        filter[0][config.vaccination.percentage] + "% fully vaccinated";
+                    const mouse = d3.mouse(this);
+                    maptip
+                        .classed('hidden', false)
+                        .attr('style', 'left:' + (mouse[0] + 520) + 'px; top:' + (mouse[1]) + 'px')
+                        .html(html);
+                }
+            }
+
+        })
+        .on("mouseout", function() {
+            maptip.classed('hidden', true);
         });
 
     choroplethMap();
@@ -868,6 +865,18 @@ function initiateMap() {
 
 
 } //initiateMap
+
+function mousemove(d) {
+    const filter = vaccinationData.filter(v => { return v[config.vaccination.county_code] == d.properties.ADM1_PCODE });
+    const html = d.properties.ADM1_EN +
+        "</br>" +
+        filter[0][config.vaccination.percentage] + "% fully vaccinated";
+    const mouse = d3.mouse(this);
+    maptip
+        .classed('hidden', false)
+        .attr('style', 'left:' + (mouse[0] + 520) + 'px; top:' + (mouse[1]) + 'px')
+        .html(html);
+} //mousemove
 
 // zoom on buttons click
 function zoomed() {
@@ -886,8 +895,8 @@ function createMapFilterSpan(country) {
     var spans = "";
     $(".map-filter").html("");
     if (countrySelectedFromMap != "") {
-        spans += '<span id="country-name">' + country + '</span>';
-        spans += '<button>Clear selection</button>';
+        spans += '<span id="country-name">' + country + ' county</span>';
+        spans += '<button>Reset map</button>';
         $(".map-filter").append(spans);
 
         $('.map-filter button').on("click", function() {
@@ -926,7 +935,7 @@ function generateDataForMap(mapData = filteredMappingData) {
     return data;
 } //generateDataForMap
 
-function createMapLabels(data = filteredMappingData) {
+function createMapLabels(data = mappingData) {
     // remove existing labels
     g.selectAll("text").remove();
 
@@ -942,7 +951,10 @@ function createMapLabels(data = filteredMappingData) {
         .attr("dy", ".35em")
         .text(function(d) { return d.properties.ADM1_EN; })
         .on("click", function(d) {
-
+            // fix inactive but clickage bug
+            if (d3.select(this).classed("inactive")) {
+                return;
+            }
             mapsvg.select('g').selectAll('.hasData').attr('fill', mapNotClickedColor);
             mapsvg.select('g').selectAll('.hasData').each(function(f) {
                 if (d.properties.ADM1_PCODE == f.properties.ADM1_PCODE) {
@@ -961,22 +973,52 @@ function createMapLabels(data = filteredMappingData) {
 } //createMapLabels
 
 function choroplethMap(mapData = filteredMappingData) {
+    let className = "hasData";
+    let legendTitle = "# organisations";
+    let countriesArr = [];
+    let legendRange = mapColorRange;
+
+    let data = orgCount(mapData);
+
+    data.forEach(element => {
+        countriesArr.push(element.key);
+    });
+    countriesArr = formatArray(countriesArr);
+
+    mapScale = d3.scaleQuantize()
+        .domain([0, data[0].values.length])
+        .range(legendRange);
 
     if (countrySelectedFromMap != "") {
         return;
     }
-    const data = orgCount();
-    var countriesArr = [];
-    data.forEach(element => {
-        countriesArr.push(element.key);
-    });
 
+    if (mapType == "vax") {
+        className = "hasVax";
+        let vaxData = vaccinationData;
+        if (mapData != undefined) {
+            vaxData = vaccinationData.filter(function(d) {
+                return countriesArr.includes(d[config.vaccination.county_code]);
+            })
+        }
+        data = d3.nest()
+            .key(d => { return d[config.vaccination.county_code]; })
+            .key(d => { return d[config.vaccination.percentage]; })
+            .rollup(d => { return d.length })
+            .entries(vaxData);
+        // setup  range color and scale to use
+        legendRange = vaxColorRange;
+        mapScale = d3.scaleQuantize()
+            .domain([0, 100])
+            .range(legendRange);
+        legendTitle = "Vaccination"
+            // return;
+    }
+    // if (mapType == "orgs") {
 
-    mapScale = d3.scaleQuantize()
-        .domain([0, data[0].values.length])
-        .range(mapColorRange);
-
-    countriesArr = formatArray(countriesArr);
+    //     data = orgCount(mapData);
+    // }
+    // data = orgCount();
 
     mapsvg.selectAll('path').each(function(element, index) {
         d3.select(this).transition().duration(500).attr('class', function(d) {
@@ -985,17 +1027,24 @@ function choroplethMap(mapData = filteredMappingData) {
         });
         d3.select(this).transition().duration(500).attr('fill', function(d) {
             var filtered = data.filter(pt => pt.key == d.properties.ADM1_PCODE);
-            var num = (filtered.length != 0) ? filtered[0].values.length : null;
+            var num = null;
+            if (filtered.length != 0) {
+                if (mapType == "vax") {
+                    num = filtered[0].values[0].key;
+                } else num = filtered[0].values.length;
+            }
+            // var num = (filtered.length != 0) ? filtered[0].values.length : null;
             var clr = (num == null) ? mapInactive : mapScale(num);
             return clr;
         });
     });
+
     createMapLabels(mapData);
 
     const legend = d3.legendColor()
         .labelFormat(d3.format(',.0f'))
-        .title("# organisations")
-        .cells(mapColorRange.length)
+        .title(legendTitle)
+        .cells(legendRange.length)
         .scale(mapScale);
     d3.select('#legend').remove();
 
