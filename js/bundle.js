@@ -46,7 +46,6 @@ $(document).ready(function() {
             activitiesAllArr = uniqueValues("Activity");
             maxAct = activitiesAllArr.length;
             childrenDefaultListArr = uniqueValues("Partner_short");
-            console.log(formatArray(uniqueValues("Partner")));
 
             parentsDetails = generatePanelDetailsArr();
             childrensDetails = generatePanelDetailsArr("Partner_short", "Partner");
@@ -255,7 +254,7 @@ function getParentDetails(value) {
     var details;
     for (let index = 0; index < array.length; index++) {
         const element = array[index];
-        if (element.key == value) {
+        if (element.key == value || element.key == "monitoring_eval") {
             details = element.value;
             break;
         }
@@ -269,7 +268,7 @@ function getChildDetails(value) {
     var details;
     for (let index = 0; index < array.length; index++) {
         const element = array[index];
-        if (element.key == value) {
+        if (element.key == value || element.key == "monitoring_eval") {
             details = element.value;
             break;
         }
@@ -793,7 +792,8 @@ let mapFillColor = '#204669', //'#C2DACA',//'#2F9C67',
     mapClickedColor = '#ef6666'; //"#f0473a";
 let countrySelectedFromMap = "";
 // let mapColorRange = ['#fdebe9', '#fac2bd', '#f79992', '#f37066']; //, '#f0473a'];
-let mapColorRange = ['#E9F1EA', '#C2DACA', '#9EC8AE', '#78B794', '#2F9C67'];
+// let mapColorRange = ['#E9F1EA', '#C2DACA', '#9EC8AE', '#78B794', '#2F9C67'];
+let mapColorRange = ['#E9F1EA', '#9EC8AE', '#2F9C67'];
 let mapScale = d3.scaleQuantize()
     .domain([0, 100])
     .range(mapColorRange);
@@ -965,14 +965,19 @@ function choroplethMap(mapData = filteredMappingData) {
     if (countrySelectedFromMap != "") {
         return;
     }
-    const data = getNestedDataByColumn("ISO3", mapData);
+    const data = orgCount();
     var countriesArr = [];
     data.forEach(element => {
         countriesArr.push(element.key);
     });
-    orgCount();
+
+
+    mapScale = d3.scaleQuantize()
+        .domain([0, data[0].values.length])
+        .range(mapColorRange);
+
     countriesArr = formatArray(countriesArr);
-    var max = data[0].value;
+
     mapsvg.selectAll('path').each(function(element, index) {
         d3.select(this).transition().duration(500).attr('class', function(d) {
             var className = (countriesArr.includes(d.properties.ADM1_PCODE)) ? 'hasData' : 'inactive';
@@ -980,12 +985,30 @@ function choroplethMap(mapData = filteredMappingData) {
         });
         d3.select(this).transition().duration(500).attr('fill', function(d) {
             var filtered = data.filter(pt => pt.key == d.properties.ADM1_PCODE);
-            var num = (filtered.length != 0) ? filtered[0].value : null;
-            var clr = (num == null) ? mapInactive : mapScale(Math.round((num * 100) / max));
+            var num = (filtered.length != 0) ? filtered[0].values.length : null;
+            var clr = (num == null) ? mapInactive : mapScale(num);
             return clr;
         });
     });
     createMapLabels(mapData);
+
+    const legend = d3.legendColor()
+        .labelFormat(d3.format(',.0f'))
+        .title("# organisations")
+        .cells(mapColorRange.length)
+        .scale(mapScale);
+    d3.select('#legend').remove();
+
+    var div = d3.select('.legend');
+    var svg = div.append('svg')
+        .attr('id', 'legend')
+        .attr('width', '90px')
+        .attr('height', '90px');
+
+    svg.append('g')
+        .attr('class', 'scale')
+        .call(legend);
+
 
 } //choroplethMap
 
@@ -994,7 +1017,14 @@ function orgCount(dataArg = filteredMappingData) {
         .key(function(d) { return d[config.ISO3]; })
         .key(function(d) { return d[config.Partner_short]; })
         .rollup(function(d) { return d.length; })
-        .entries(dataArg).sort(sortNestedData);
-    console.log(data);
+        .entries(dataArg).sort(function(a, b) {
+            if (a.values.length > b.values.length) {
+                return -1
+            }
+            if (a.values.length < b.values.length) {
+                return 1
+            }
+            return 0;
+        });
     return data;
 }

@@ -328,6 +328,26 @@ svg g path path.inactive {
     color: #ef6666;
 }
 
+.legend {
+    position: absolute;
+    /* left: 45px; */
+    bottom: 30px;
+    width: 105px;
+    padding: 5px 0 0 10px;
+    /* height: 95px; */
+}
+
+.legend .label {
+    fill: #000;
+    font-size: 12px;
+}
+
+.legend .legendTitle {
+    font-size: .8rem;
+    fill: #000;
+    transform: translate(0, 9px);
+}
+
 
 /* #map {
     width: 450px;
