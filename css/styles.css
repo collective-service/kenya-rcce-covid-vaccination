@@ -449,18 +449,21 @@ svg g path path.inactive {
     padding: 0;
 }
 
-.vax-block {
+.vax-block,
+.score {
     display: flex;
-    /* justify-content: center; */
+    justify-content: center;
     align-items: center;
-    gap: 8px
 }
 
-#vax-pct {
+#score {
     border-radius: 10px;
     font-size: .9rem;
     padding: 3px;
     color: #fff;
+    min-width: 40px;
+    text-align: center;
+    margin-bottom: 0;
 }
 
 .vax-block p {

@@ -46,6 +46,7 @@ $(document).ready(function() {
             activitiesAllArr = uniqueValues("Activity");
             maxAct = activitiesAllArr.length;
             childrenDefaultListArr = uniqueValues("Partner_short");
+            console.log(formatArray(uniqueValues("Partner")));
 
             parentsDetails = generatePanelDetailsArr();
             childrensDetails = generatePanelDetailsArr("Partner_short", "Partner");
@@ -537,16 +538,21 @@ function getCountyReport(county) {
     }
 
     var divVax = '<div class="vax"><header>Vaccination</header>' +
-        '<div class="vax-block"><p id="vax-pct">' + countyVax + '</p><p>fully vaccinated<p></div>';
+        '<div id="vaxGauge"></div>' +
+        '<div class="vax-block"><p id="vax-label">fully vaccinated</p></div>';
+    // '<div class="vax-block"><p id="vax-pct">' + countyVax + '</p><p>fully vaccinated<p></div>';
 
     if (vaxSourceDate != "N/A") {
         divVax += '<div> <p class="vax-source">Source: MoH, ' + vaxSourceDate + '</p></div></div>';
     } else divVax += '</div>';
 
-    const divs = '<div id="graphes">' + divVax + '<header>Activity coverage</header><div id="gauge"></div></div>';
+
+
+    const divs = '<div id="graphes">' + divVax +
+        '<header>Activity coverage</header><div class="score"><p id="score">6/9</p></div></div>';
     $('#countyReport').append(divs);
 
-    d3.select("#vax-pct").style("background", "#ef6666");
+    // const vaxgaugeChart = createVaxChart(countyVax);
 
     const filter = mappingData.filter(function(d) {
         return d[config["ISO3"]] == county;
@@ -558,7 +564,23 @@ function getCountyReport(county) {
         !countyAct.includes(element) ? missingAct.push(element) : null;
 
     }
-    const gaugeChart = generateGauge(countyAct);
+    $('#score').text(String(countyAct.length) + "/" + String(activitiesAllArr.length));
+    d3.select("#score").style("background", function() {
+        if (countyAct.length <= 3) {
+            return "#FF0000";
+        }
+        if (countyAct.length <= 7) {
+            return "#F6C600";
+        }
+        if (countyAct.length > 7) {
+            return "#2F9C67";
+        }
+        return "#ef6666";
+    }); //"#ef6666"
+
+    const vaxgaugeChart = createVaxChart(countyVax);
+    // const gaugeChart = generateGauge(countyAct);
+
     var spans = '<p class="clearPadding">None</p>';
     if (missingAct.length > 0) {
         spans = '';
@@ -570,6 +592,45 @@ function getCountyReport(county) {
     const missingActDiv = '<div class="missing"><header>Gap</header>' + spans + '</div>';
     $('#graphes').append(missingActDiv);
 } //getCountyReport
+
+function createVaxChart(vax) {
+    var chart = c3.generate({
+        bindto: '#vaxGauge',
+        data: {
+            columns: [
+                ['data', vax]
+            ],
+            type: 'gauge'
+        },
+        gauge: {
+            label: {
+                format: function(value, ratio) {
+                    return vax + "%";
+                },
+                show: false // to turn off the min/max labels.
+            },
+            width: 20 // for adjusting arc thickness
+        },
+        color: {
+            pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'], // the three color levels for the percentage values.
+            threshold: {
+                //            unit: 'value', // percentage is default
+                //            max: 200, // 100 is default
+                values: [30, 60, 90, 100]
+            }
+        },
+        size: {
+            height: 100
+        },
+        legend: {
+            show: false
+        },
+        tooltip: {
+            show: false
+        }
+    });
+    return chart;
+}
 
 function generateGauge(arr) {
     const val = arr.length;
@@ -909,6 +970,7 @@ function choroplethMap(mapData = filteredMappingData) {
     data.forEach(element => {
         countriesArr.push(element.key);
     });
+    orgCount();
     countriesArr = formatArray(countriesArr);
     var max = data[0].value;
     mapsvg.selectAll('path').each(function(element, index) {
@@ -926,3 +988,13 @@ function choroplethMap(mapData = filteredMappingData) {
     createMapLabels(mapData);
 
 } //choroplethMap
+
+function orgCount(dataArg = filteredMappingData) {
+    var data = d3.nest()
+        .key(function(d) { return d[config.ISO3]; })
+        .key(function(d) { return d[config.Partner_short]; })
+        .rollup(function(d) { return d.length; })
+        .entries(dataArg).sort(sortNestedData);
+    console.log(data);
+    return data;
+}
