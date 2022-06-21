@@ -47,7 +47,6 @@ $(document).ready(function() {
             descriptionData = data[4];
 
             generateDescription();
-            setLastUpdatedDate();
 
             parentsDefaultListArr = uniqueValues("Activity");
             activitiesAllArr = uniqueValues("Activity");
