@@ -242,7 +242,6 @@ function getPanelItemDetails(value) {
     var details;
     for (let index = 0; index < array.length; index++) {
         const element = array[index];
-        console.log(element)
         if (element.key == value) {
             details = element.value;
             break;
@@ -254,9 +253,10 @@ function getPanelItemDetails(value) {
 function getParentDetails(value) {
     const array = displayBy == "activity" ? parentsDetails : childrensDetails;
     var details;
+
     for (let index = 0; index < array.length; index++) {
         const element = array[index];
-        if (element.key == value || element.key == "monitoring_eval") {
+        if (element.key == value || element.key == "monitoring & evaluation") {
             details = element.value;
             break;
         }
@@ -279,23 +279,89 @@ function getChildDetails(value) {
 
 } //getChildDetails
 
+function getParentBarChartData(dataArg = filteredMappingData) {
+    const data = d3.nest()
+        // .key(d => { return [d[config.Activity], d[config.Partner_short]] })
+        .key(d => { return d[config.Activity] })
+        .key(d => { return d[config.Partner_short] })
+        .rollup(d => { return d.length })
+        .entries(dataArg);
+
+    let arr = [];
+    data.forEach(element => {
+        arr.push({ key: element.key, value: element.values.length })
+    });
+    arr = arr.sort(sortNestedData);
+    return arr;
+} //getParentBarChartData
+
+function getChildBarChartData(dataArg = filteredMappingData) {
+    const data = d3.nest()
+        // .key(d => { return [d[config.Activity], d[config.Partner_short]] })
+        .key(d => { return d[config.Partner_short] })
+        .key(d => { return d[config.Activity] })
+        .rollup(d => { return d.length })
+        .entries(dataArg);
+
+    let arr = [];
+    data.forEach(element => {
+        arr.push({ key: element.key, value: element.values.length })
+    });
+    arr = arr.sort(sortNestedData);
+    console.log(arr);
+    return arr;
+} //getParentBarChartData
+
+function createBarChart(nestedData, parent = true) {
+    const partialId = (parent) ? "bar-chart" : "bar-chart-child";
+    const xScale = d3.scaleLinear()
+        .domain([0, nestedData[0].value])
+        .range([0, 210]);
+
+    const width = 200;
+    const height = 20;
+    const margin = { top: 30, right: 40, bottom: 0, left: 14 };
+
+    for (let index = 0; index < nestedData.length; index++) {
+        const element = nestedData[index];
+        const id = partialId + index;
+        const wdth = xScale(element.value);
+        let svg = d3.select('#' + id).append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .append('rect')
+            .attr("height", height - 5)
+            .transition().duration(200)
+            .attr('width', wdth) //function(d) { return xScale(d.value) })
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("fill", "#f0473a");
+    }
+
+} //createBarChart
+
 function createPanelListItems(arr = parentsDefaultListArr) {
+
     $(".collection-item").html('');
-    const hiddenClass = (!d3.select("#viewDetails").property("checked")) ? "hidden" : null;
+    const hiddenClass = (!d3.select("#viewDetails").property("checked")) ? "hidden" : '';
     var lis = [];
     for (let index = 0; index < arr.length; index++) {
         const element = arr[index];
+
         const p = getParentDetails(element);
+        const id = "bar-chart" + index;
         lis += '<li>' +
             '<div class="item">' +
             '<h6>' + element + '</h6>' +
+            // '<p id="' + id + '"></p>' +
             '<div class="contenu ' + hiddenClass + '">' +
             '<p>' + p + '</p>' +
             '</div></div>' +
             '</li>';
-
     }
     $(".collection-item").append(lis);
+    // const nestedData = getParentBarChartData();
+    // createBarChart(nestedData);
 
     $(".collection-item li").on("click", function(d) {
         // const parentSelection = getSelectedItemFromUl("collection-item");
@@ -327,16 +393,21 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
     for (let index = 0; index < arr.length; index++) {
         const element = arr[index];
         var p = getChildDetails(element);
-
+        const id = "bar-chart-child" + index;
         lis += '<li>' +
             '<div class="item">' +
             '<h6>' + element + '</h6>' +
+            // '<p id="' + id + '"></p>' +
             '<div class="contenu ' + hiddenClass + '">' +
             '<p>' + p + '</p>' +
             '</div>' +
             '</li>';
     }
     $(".children").append(lis);
+
+    getChildBarChartData();
+    // const nestedData = getChildBarChartData();
+    // createBarChart(nestedData, false);
 
     $(".children li").on("click", function(d) {
         const parentSelected = getSelectedItemFromUl("collection-item");
@@ -459,7 +530,8 @@ function uniqueValues(columnName, data = filteredMappingData) {
     var arr = [];
 
     keyValArr.forEach(element => {
-        arr.push(element.key);
+        const key = element.key == "monitoring_eval" ? "monitoring & evaluation" : element.key;
+        arr.push(key);
     });
     return arr;
 }

@@ -1,4 +1,5 @@
 {
+    "Data_id": "_id",
     "Partner": "name_org",
     "Partner_short": "Acr_org",
     "Activity": "activity",
@@ -17,7 +18,7 @@
         "training": "Training and capacity development",
         "delivery": "Service Delivery",
         "logistics": "Logistics and Supply chain",
-        "monitoring_eval": "Monitoring and Evaluation (support supervision)",
+        "monitoring & evaluation": "Monitoring and Evaluation (support supervision)",
         "regulatory": "Regulatory and Oversight",
         "surveillance": "Surveillance and EOC",
         "data": "Data management"
