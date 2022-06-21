@@ -27,5 +27,9 @@
         "county_code": "County_code",
         "percentage": "% fully vaccinated",
         "source_date": "Source Date"
+    },
+    "Desc": {
+        "Date": "Last_updated_date",
+        "Texte": "Description"
     }
 }

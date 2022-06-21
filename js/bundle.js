@@ -1,14 +1,17 @@
 //BRR
 const geodataUrl = 'data/ken_counties.json';
-const fourWDataUrl = 'data/data.csv';
+const fourWDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzl-1-YKB83rASc_f9s6xKYUY9PjMKQW1uQzbP50BcaPL2xvGovG9Y17xHt_GxSNBdJRJY-Qdhon9X/pub?gid=546885235&single=true&output=csv';
+// const fourWDataUrl = 'data/data.csv';
 const configFileURL = 'data/config.json';
 const vaxURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzl-1-YKB83rASc_f9s6xKYUY9PjMKQW1uQzbP50BcaPL2xvGovG9Y17xHt_GxSNBdJRJY-Qdhon9X/pub?gid=0&single=true&output=csv";
+const descURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzl-1-YKB83rASc_f9s6xKYUY9PjMKQW1uQzbP50BcaPL2xvGovG9Y17xHt_GxSNBdJRJY-Qdhon9X/pub?gid=1764626957&single=true&output=csv";
 
 let geomData,
     mappingData,
     filteredMappingData,
     config,
-    vaccinationData;
+    vaccinationData,
+    descriptionData;
 
 let parentsDefaultListArr = [],
     childrenDefaultListArr = [];
@@ -27,7 +30,8 @@ $(document).ready(function() {
             d3.json(geodataUrl),
             d3.csv(fourWDataUrl),
             d3.json(configFileURL),
-            d3.csv(vaxURL)
+            d3.csv(vaxURL),
+            d3.csv(descURL)
         ]).then(function(data) {
             geomData = topojson.feature(data[0], data[0].objects.kenya_counties);
             // console.log(geomData)
@@ -40,7 +44,9 @@ $(document).ready(function() {
             mappingData = data[1];
             filteredMappingData = mappingData;
             vaccinationData = data[3];
+            descriptionData = data[4];
 
+            generateDescription();
             setLastUpdatedDate();
 
             parentsDefaultListArr = uniqueValues("Activity");
@@ -60,12 +66,20 @@ $(document).ready(function() {
             setMetricsPanels();
             //remove loader and show vis
             $('.loader').hide();
-            $('#main').css('opacity', 1);
+            $('.container-fluid').css('opacity', 1);
         }); // then
     } // getData
 
     getData();
 });
+
+function generateDescription() {
+
+    const date = descriptionData[0][config.Desc.Date];
+    const texte = descriptionData[0][config.Desc.Texte];
+    d3.select("#date_updated").text(date);
+    d3.select(".text-accroche").text(texte);
+}
 
 function generatePanelDetailsArr(parent, child) {
     const data = d3.nest()
@@ -308,7 +322,6 @@ function getChildBarChartData(dataArg = filteredMappingData) {
         arr.push({ key: element.key, value: element.values.length })
     });
     arr = arr.sort(sortNestedData);
-    console.log(arr);
     return arr;
 } //getParentBarChartData
 
@@ -405,7 +418,6 @@ function createChildrenPanel(arr = childrenDefaultListArr) {
     }
     $(".children").append(lis);
 
-    getChildBarChartData();
     // const nestedData = getChildBarChartData();
     // createBarChart(nestedData, false);
 
