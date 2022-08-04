@@ -1,7 +1,7 @@
 //BRR
 const geodataUrl = 'data/ken_counties.json';
-const fourWDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSzl-1-YKB83rASc_f9s6xKYUY9PjMKQW1uQzbP50BcaPL2xvGovG9Y17xHt_GxSNBdJRJY-Qdhon9X/pub?gid=546885235&single=true&output=csv';
-// const fourWDataUrl = 'data/data.csv';
+const fourWDataUrl = 'https://raw.githubusercontent.com/collective-service/cs-kobo-scraper/main/data/data_kenya_4w.csv';
+// const fourWDataUrl = 'data/data_kenya_4w_cleaned.csv';
 const configFileURL = 'data/config.json';
 const vaxURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzl-1-YKB83rASc_f9s6xKYUY9PjMKQW1uQzbP50BcaPL2xvGovG9Y17xHt_GxSNBdJRJY-Qdhon9X/pub?gid=0&single=true&output=csv";
 const descURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzl-1-YKB83rASc_f9s6xKYUY9PjMKQW1uQzbP50BcaPL2xvGovG9Y17xHt_GxSNBdJRJY-Qdhon9X/pub?gid=1764626957&single=true&output=csv";
